@@ -44,6 +44,7 @@ demo-germany = Germany
 demo-ham-racks = Hamburg
 ```
 
+## PHP code integration
 To get the integration running and to allow NagVis to find the configured
 handlers you need to add a short piece of code to 
 `<nagvisdir>/share/server/core/functions/index.php`:
@@ -61,3 +62,4 @@ require_once EmbeddedWeb::start(null, '/etc/icingaweb')
     ->getLibDir() . '/nagvis-includes/init.inc.php';
 ```
 
+This has to sit on top of the page, but after the `<?php` line.

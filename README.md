@@ -43,3 +43,21 @@ default-map = demo-overview
 demo-germany = Germany
 demo-ham-racks = Hamburg
 ```
+
+To get the integration running and to allow NagVis to find the configured
+handlers you need to add a short piece of code to 
+`<nagvisdir>/share/server/core/functions/index.php`:
+
+```php
+/**
+ * Icinga Web 2 integration
+ */
+use Icinga\Application\EmbeddedWeb;
+
+require_once '/usr/local/icingaweb2/library/Icinga/Application/EmbeddedWeb.php';
+require_once EmbeddedWeb::start(null, '/etc/icingaweb')
+    ->getModuleManager()
+    ->getModule('nagvis')
+    ->getLibDir() . '/nagvis-includes/init.inc.php';
+```
+

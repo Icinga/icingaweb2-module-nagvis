@@ -22,9 +22,11 @@ hostgroupurl = "[htmlcgi]/monitoring/show/hostgroup?hostgroup=[hostgroup_name]"
 serviceurl = "[htmlcgi]/monitoring/show/service?host=[host_name]&service=[service_description]"
 servicegroupurl = "[htmlcgi]/monitoring/show/servicegroup?servicegroup=[servicegroup_name]"
 headermenu="0"
+stylesheet="icingaweb-nagvis-integration.css"
 ```
 
-
+The CSS file `public/css/icingaweb-nagvis-integration.css` must be copied to
+`<nagvisdir>/share/userfiles/styles`.
 
 ## Module Configuration
 For many environments the module needs no special configuration. Usually

@@ -1,0 +1,7 @@
+#header ul.head li:first-child {
+  display: none;
+}
+
+#header ul.head.right {
+    display: none;
+}

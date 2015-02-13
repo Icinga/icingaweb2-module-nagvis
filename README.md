@@ -21,6 +21,7 @@ hosturl = "[htmlcgi]/monitoring/show/host?host=[host_name]"
 hostgroupurl = "[htmlcgi]/monitoring/show/hostgroup?hostgroup=[hostgroup_name]"
 serviceurl = "[htmlcgi]/monitoring/show/service?host=[host_name]&service=[service_description]"
 servicegroupurl = "[htmlcgi]/monitoring/show/servicegroup?servicegroup=[servicegroup_name]"
+mapurl="[htmlcgi]/nagvis/show/map?map=[map_name]"
 headermenu="0"
 stylesheet="icingaweb-nagvis-integration.css"
 ```

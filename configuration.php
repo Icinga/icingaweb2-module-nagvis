@@ -16,6 +16,11 @@ $this->providePermission(
 );
 
 $this->providePermission(
+    'nagvis/edit',
+    $this->translate('Modify NagVis maps')
+);
+
+$this->providePermission(
     'nagvis/admin',
     $this->translate('Nagvis administration')
 );

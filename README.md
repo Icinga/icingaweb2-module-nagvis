@@ -55,7 +55,7 @@ handlers you need to add a short piece of code to
  */
 use Icinga\Application\EmbeddedWeb;
 
-require_once '/usr/local/icingaweb2/library/Icinga/Application/EmbeddedWeb.php';
+require_once 'Icinga/Application/EmbeddedWeb.php';
 require_once EmbeddedWeb::start(null, '/etc/icingaweb')
     ->getModuleManager()
     ->getModule('nagvis')

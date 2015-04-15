@@ -1,4 +1,4 @@
-#header ul.head li:first-child {
+#header ul.head > li:first-child a {
   display: none;
 }
 

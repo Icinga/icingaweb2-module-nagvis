@@ -7,7 +7,7 @@ $section = $this->menuSection($this->translate('Maps'))
     ->setIcon('globe');
 
 foreach (Config::module('nagvis')->getSection('menu') as $name => $caption) {
-    $section->add($caption)->setUrl('nagvis/show/map')->getUrl()->setParams(array('map' => $name));
+    $section->add($caption)->setUrl('nagvis/show/map', array('map' => $name));
 }
 
 $this->providePermission(

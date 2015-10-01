@@ -1,7 +1,7 @@
 <?php
 
 use Icinga\Application\Icinga;
-use Icinga\Authentication\Manager;
+use Icinga\Authentication\Auth;
 
 class CoreAuthModIcingaweb2 extends CoreAuthModule
 {
@@ -49,7 +49,7 @@ class CoreAuthModIcingaweb2 extends CoreAuthModule
         }
 
         $this->app = Icinga::app();
-        $this->auth = Manager::getInstance();
+        $this->auth = Auth::getInstance();
         if ($this->auth->isAuthenticated()) {
             $this->user = $this->auth->getUser();
         }

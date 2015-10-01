@@ -1,7 +1,7 @@
 <?php
 
 use Icinga\Application\Icinga;
-use Icinga\Authentication\Manager;
+use Icinga\Authentication\Auth;
 
 class CoreAuthorisationModIcingaweb2 extends CoreAuthorisationModule
 {
@@ -11,7 +11,7 @@ class CoreAuthorisationModIcingaweb2 extends CoreAuthorisationModule
 
     public function __construct()
     {
-        $this->auth = Manager::getInstance();
+        $this->auth = Auth::getInstance();
     }
 
     public function parsePermissions($sUsername = null)

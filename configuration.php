@@ -2,7 +2,7 @@
 
 use Icinga\Application\Config;
 
-$section = $this->menuSection($this->translate('Maps'))
+$section = $this->menuSection(N_('Maps'))
     ->setUrl('nagvis/show/map')
     ->setIcon('globe');
 

@@ -12,7 +12,7 @@ authorisationmodule="CoreAuthorisationModIcingaweb2"
 logonmodule="LogonIcingaweb2"
 
 [paths]
-htmlcgi = "/icingaweb"
+htmlcgi = "/icingaweb2"
 
 [defaults]
 backend = "ndomy_1"
@@ -56,7 +56,7 @@ handlers you need to add a short piece of code to
 use Icinga\Application\EmbeddedWeb;
 
 require_once 'Icinga/Application/EmbeddedWeb.php';
-require_once EmbeddedWeb::start(null, '/etc/icingaweb')
+require_once EmbeddedWeb::start(null, '/etc/icingaweb2')
     ->getModuleManager()
     ->getModule('nagvis')
     ->getLibDir() . '/nagvis-includes/init.inc.php';

@@ -1,0 +1,12 @@
+Name: NagVis
+Version: 1.0.0
+Depends: monitoring>=2.0.0
+Description: NagVis integration
+ NagVis is a visualization addon for Icinga or Nagios. It can be used
+ to visualize monitoring data in combination with all kinds of pictures
+ or maps. This allows to show the state of your infrastructure in many
+ different creative ways.
+ 
+ This module requires NagVis to be configured and installed. It provides
+ an additional authentication-, authorisation and logon implementation
+ for NagVis.

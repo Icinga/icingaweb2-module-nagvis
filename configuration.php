@@ -7,7 +7,10 @@ $section = $this->menuSection(N_('Maps'))
     ->setIcon('globe');
 
 foreach (Config::module('nagvis')->getSection('menu') as $name => $caption) {
-    $section->add($caption)->setUrl('nagvis/show/map', array('map' => $name));
+    $section->add($caption, array(
+        'url'           => 'nagvis/show/map',
+        'urlParameters' => array('map' => $name)
+    ));
 }
 
 $this->providePermission(

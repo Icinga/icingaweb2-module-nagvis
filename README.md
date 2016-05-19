@@ -49,6 +49,23 @@ demo-germany = Germany
 demo-ham-racks = Hamburg
 ```
 
+## Icinga Web 2 Configuration
+
+Since Icinga Web 2.3.0 session cookies are restricted to `/icingaweb2` or
+your Icinga Web 2 base path. This means that your browser would not send
+your session cookie to `/nagvis` and you would not be granted access to
+NagVis. To solve this please add a section as follows to your Icinga Web 2
+configuration in `/etc/icingaweb2/config.ini`:
+
+```ini
+[cookie]
+path = /
+```
+
+Before doing so please log out from Icinga Web 2 and close your browser,
+just to be on the safe side. You could otherwise lock your browser in a
+redirection loop.
+
 ## PHP code integration
 To get the integration running and to allow NagVis to find the configured
 handlers you need to add a short piece of code to 

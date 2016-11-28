@@ -2,6 +2,6 @@
   display: none;
 }
 
-#header ul.head.right {
+#header ul.head.right li.dropdown {
     display: none;
 }

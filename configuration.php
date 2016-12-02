@@ -6,10 +6,12 @@ $section = $this->menuSection(N_('Maps'))
     ->setUrl('nagvis/show/map')
     ->setIcon('globe');
 
+$prio = 0;
 foreach (Config::module('nagvis')->getSection('menu') as $name => $caption) {
     $section->add($caption, array(
         'url'           => 'nagvis/show/map',
-        'urlParameters' => array('map' => $name)
+        'urlParameters' => array('map' => $name),
+        'priority'      => ++$prio
     ));
 }
 

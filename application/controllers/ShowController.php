@@ -7,7 +7,7 @@ use Icinga\Web\Url;
 use Icinga\Web\Widget\Tabextension\DashboardAction;
 use Icinga\Web\Widget\Tabextension\MenuAction;
 
-class Nagvis_ShowController extends Controller
+class ShowController extends Controller
 {
     public function getTabs()
     {

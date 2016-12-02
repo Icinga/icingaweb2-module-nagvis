@@ -1,3 +1,18 @@
-<a id="toggle-menu" href="<?= $this->toggleMenuUrl ?>"><?= $this->escape($this->toggleMenuCaption ) ?></a>
-<iframe id="nagvis-iframe" src="<?= $this->nagvisUrl ?>" width="100%" height="99%" marginheight=0 marginwidth=0 wspace=0 frameborder=0 ></iframe><!-- onload="nagvis_frame_reload();" -->
+<?php if (! $this->compact): ?>
+<div class="controls">
+    <?= $tabs; ?>
+</div>
+<?php endif ?>
 
+<?php
+
+if ($this->height) {
+    $attr = sprintf(' height="%d"', $height);
+} elseif (! $this->compact) {
+    $attr = ' height="99%"';
+} else {
+    $attr = '';
+}
+
+?>
+<iframe id="nagvis-iframe" src="<?= $this->nagvisUrl ?>" width="100%"<?= $attr ?> marginheight=0 marginwidth=0 wspace=0 frameborder=0 ></iframe><!-- onload="nagvis_frame_reload();" -->

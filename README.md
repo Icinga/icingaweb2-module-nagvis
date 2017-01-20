@@ -1,8 +1,11 @@
 # Icinga Web 2 Nagvis Module
 ## Requirements
 
-* Icinga Web 2 (&gt;= 2.0.0)
-* NagVis
+This module glues NagVis and Icinga Web 2 together. Both of them are required
+to be installed and configured:
+
+* [Icinga Web 2](https://github.com/icinga/icingaweb2) (&gt;= 2.0.0)
+* [NagVis](http://www.nagvis.org/) (&gt;= 1.8)
 
 ## NagVis Configuration
 This module provides everything for a complete Icinga Web 2 NagVis

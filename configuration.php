@@ -30,6 +30,11 @@ $this->providePermission(
     $this->translate('Nagvis administration')
 );
 
+$this->providePermission(
+    'nagvis/overview',
+    $this->translate('NagVis general overview')
+);
+
 $this->provideRestriction(
     'nagvis/map/filter',
     $this->translate('Filter NagVis maps')

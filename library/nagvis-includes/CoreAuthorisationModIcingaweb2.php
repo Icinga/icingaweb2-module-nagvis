@@ -23,11 +23,14 @@ class CoreAuthorisationModIcingaweb2 extends CoreAuthorisationModule
         $perms = array(
             'General'  => array('*' => array('*' => true)),
             'User'     => array('setOption' => array('*' => true)),
-            //'Overview' => array('view' => array('*' => true)),
             'Map'      => array('view' => array('*' => true)),
             'Search'   => array('view' => array('*' => true)),
             'Rotation' => array('view' => array('*' => true))
         );
+
+        if ($this->auth->hasPermission('nagvis/overview')) {
+            $perms['Overview'] = array('view' => array('*' => true));
+        }
 
         // Never allowed:
         // ChangePassword - change

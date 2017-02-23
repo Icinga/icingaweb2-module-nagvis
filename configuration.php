@@ -16,11 +16,6 @@ foreach (Config::module('nagvis')->getSection('menu') as $name => $caption) {
 }
 
 $this->providePermission(
-    'nagvis/read',
-    $this->translate('Show NagVis maps')
-);
-
-$this->providePermission(
     'nagvis/edit',
     $this->translate('Modify NagVis maps')
 );

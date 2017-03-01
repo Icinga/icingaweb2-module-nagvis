@@ -16,6 +16,8 @@ class CoreAuthorisationModIcingaweb2 extends CoreAuthorisationModule
 
     public function parsePermissions($sUsername = null)
     {
+        global $CORE;
+
         if ($sUsername !== null) {
             die('parsePermissions() with username is not supported');
         }
@@ -23,10 +25,40 @@ class CoreAuthorisationModIcingaweb2 extends CoreAuthorisationModule
         $perms = array(
             'General'  => array('*' => array('*' => true)),
             'User'     => array('setOption' => array('*' => true)),
-            'Map'      => array('view' => array('*' => true)),
             'Search'   => array('view' => array('*' => true)),
             'Rotation' => array('view' => array('*' => true))
         );
+
+        $mapFilters = array();
+        foreach ($this->auth->getRestrictions('nagvis/map/filter') as $filter) {
+            if (! empty($filter)) {
+                $mapFilters = array_merge($mapFilters, array_map('trim', explode(',', $filter)));
+            }
+        }
+
+        if (! empty($mapFilters)) {
+            $mapFilters = array_unique($mapFilters);
+            $regex = array();
+            foreach ($mapFilters as $filter) {
+                $nonWildcards = array();
+                foreach (explode('*', $filter) as $nonWildcard) {
+                    $nonWildcards[] = preg_quote($nonWildcard, '/');
+                }
+                $regex[] = implode('.*', $nonWildcards);
+            }
+
+            $maps = array();
+
+            foreach ($CORE->getAvailableMaps('/^(?:' . implode('|', $regex) . ')$/i') as $map) {
+                $maps[$map] = true;
+            }
+
+            if (! empty($maps)) {
+                $perms['Map'] = array('view' => $maps);
+            }
+        } else {
+            $perms['Map'] = array('view' => array('*' => true));
+        }
 
         if ($this->auth->hasPermission('nagvis/overview')) {
             $perms['Overview'] = array('view' => array('*' => true));

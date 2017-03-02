@@ -1,6 +1,6 @@
 name: NagVis
 description: "file:///README.md"
-url: "https://dev.icinga.org/projects/icingaweb2-module-pnp"
+url: "https://github.com/Icinga/icingaweb2-module-nagvis"
 tags: NagVis, Charts, Maps, Monitoring, Visualization
 vendor: Icinga
 target: Icinga Web 2
@@ -8,11 +8,11 @@ type: Module
 license: gplv2
 releases:
   -
-    name: v1.0.0
+    name: v1.1.0
     description: "Current"
     files:
       -
         name: icingaweb2-module-nagvis.zip
-        url: "https://github.com/Icinga/icingaweb2-module-nagvis/archive/v1.0.0.zip"
-        description: Module file for Icinga Web 2
-        checksum: fc10ab360ca0d3e831828c935aeee78c
+        url: "https://github.com/Icinga/icingaweb2-module-nagvis/archive/v1.1.0.zip"
+        description: Module for Icinga Web 2
+        checksum: 7c46eed61b816ecf1779f4f3262537b9

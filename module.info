@@ -1,5 +1,5 @@
 Name: NagVis
-Version: 1.1.0
+Version: 1.1.1
 Depends: monitoring>=2.0.0
 Description: NagVis integration
  NagVis is a visualization addon for Icinga or Nagios. It can be used

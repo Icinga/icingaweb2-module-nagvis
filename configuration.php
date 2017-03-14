@@ -1,13 +1,18 @@
 <?php
 
 use Icinga\Application\Config;
+use Icinga\Module\Nagvis\RestrictionHelper;
 
 $section = $this->menuSection(N_('Maps'))
     ->setUrl('nagvis/show/map')
     ->setIcon('globe');
 
 $prio = 0;
+$restriction = RestrictionHelper::getRegex();
 foreach (Config::module('nagvis')->getSection('menu') as $name => $caption) {
+    if ($restriction !== null && ! preg_match($restriction, $name)) {
+        continue;
+    }
     $section->add($caption, array(
         'url'           => 'nagvis/show/map',
         'urlParameters' => array('map' => $name),

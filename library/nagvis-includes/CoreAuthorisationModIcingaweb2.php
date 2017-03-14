@@ -2,6 +2,7 @@
 
 use Icinga\Application\Icinga;
 use Icinga\Authentication\Auth;
+use Icinga\Module\Nagvis\RestrictionHelper;
 
 class CoreAuthorisationModIcingaweb2 extends CoreAuthorisationModule
 {
@@ -29,30 +30,12 @@ class CoreAuthorisationModIcingaweb2 extends CoreAuthorisationModule
             'Rotation' => array('view' => array('*' => true))
         );
 
-        $mapFilters = array();
-        foreach ($this->auth->getRestrictions('nagvis/map/filter') as $filter) {
-            if (! empty($filter)) {
-                $mapFilters = array_merge($mapFilters, array_map('trim', explode(',', $filter)));
-            }
-        }
-
-        if (! empty($mapFilters)) {
-            $mapFilters = array_unique($mapFilters);
-            $regex = array();
-            foreach ($mapFilters as $filter) {
-                $nonWildcards = array();
-                foreach (explode('*', $filter) as $nonWildcard) {
-                    $nonWildcards[] = preg_quote($nonWildcard, '/');
-                }
-                $regex[] = implode('.*', $nonWildcards);
-            }
-
+        $restriction = RestrictionHelper::getRegex();
+        if ($restriction !== null) {
             $maps = array();
-
-            foreach ($CORE->getAvailableMaps('/^(?:' . implode('|', $regex) . ')$/i') as $map) {
+            foreach ($CORE->getAvailableMaps($restriction) as $map) {
                 $maps[$map] = true;
             }
-
             if (! empty($maps)) {
                 $perms['Map'] = array('view' => $maps);
             }

@@ -2,6 +2,7 @@
 
 namespace Icinga\Module\Nagvis\Controllers;
 
+use Icinga\Module\Nagvis\RestrictionHelper;
 use Icinga\Security\SecurityException;
 use Icinga\Web\Controller;
 use Icinga\Web\Url;
@@ -62,26 +63,9 @@ class ShowController extends Controller
             )
         );
 
-        $mapFilters = array();
-        foreach ($this->getRestrictions('nagvis/map/filter') as $mapFilter) {
-            if ($mapFilter !== '') {
-                $mapFilters = array_merge($mapFilters, array_map('trim', explode(',', $mapFilter)));
-            }
-        }
-
-        if (! empty($mapFilters)) {
-            $mapRegexParts = array();
-            foreach (array_unique($mapFilters) as $mapFilter) {
-                $nonWildcards = array();
-                foreach (explode('*', $mapFilter) as $nonWildcard) {
-                    $nonWildcards[] = preg_quote($nonWildcard, '/');
-                }
-                $mapRegexParts[] = implode('.*', $nonWildcards);
-            }
-
-            if (! preg_match('/^(?:' . implode('|', $mapRegexParts) . ')$/i', $map)) {
-                throw new SecurityException('You\'re not allowed to view map "%s"', $map);
-            }
+        $restriction = RestrictionHelper::getRegex();
+        if ($restriction !== null && ! preg_match($restriction, $map)) {
+            throw new SecurityException('You\'re not allowed to view map "%s"', $map);
         }
 
         $baseurl = $this->Config()->get('global', 'baseurl', '/nagvis');

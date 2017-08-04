@@ -4,6 +4,8 @@ use Icinga\Application\Config;
 use Icinga\Module\Nagvis\RestrictionHelper;
 
 $section = $this->menuSection(N_('Maps'))
+    ->setIcon('globe')
+    ->add($this->translate('NagVis'))
     ->setUrl('nagvis/show/map')
     ->setIcon('globe');
 

@@ -18,7 +18,7 @@ This module integrates [NagVis](https://www.nagvis.org/) into [Icinga Web 2](htt
 and allows you to create beautiful maps for your datacenter, geolocation based maps or dynamic maps with parent-child
 relations.
 
-<img src="https://github.com/Icinga/icingaweb2-module-nagvis/blob/master/doc/screenshot/geomaps.png" alt="Geomaps" height="300">
+<img src="https://github.com/Icinga/icingaweb2-module-nagvis/blob/master/doc/screenshot/geomap.png" alt="Geomap" height="300">
 
 <img src="https://github.com/Icinga/icingaweb2-module-nagvis/blob/master/doc/screenshot/groups.png" alt="Groups" height="300">
 

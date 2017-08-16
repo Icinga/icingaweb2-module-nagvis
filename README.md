@@ -41,7 +41,7 @@ to be installed and configured:
 
 ## Installation
 
-Extract this module to your Icinga Web 2 modules directory as `map` directory.
+Extract this module to your Icinga Web 2 modules directory as `nagvis` directory.
 
 Git clone:
 

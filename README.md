@@ -174,6 +174,42 @@ require_once EmbeddedWeb::start('/usr/share/icingaweb2', '/etc/icingaweb2')
 
 This has to sit on top of the page, but after the `<?php` line.
 
+### PHP on CentOS
+
+**Warning:** If you are running NagVis on CentOS - you also have to switch NagVis to PHP-FPM, so that the runtime
+environment has access to the same PHP session data (if not you only see "not authenticated").
+
+The following options are possible:
+
+**Switch all PHP inside Apache to FPM**
+
+Note: Only works with Apache >= 2.4
+
+Add `/etc/httpd/conf.d/php-fpm.conf`:
+```apache
+DirectoryIndex index.php
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+
+<FilesMatch "\.php$">
+    SetHandler "proxy:fcgi://127.0.0.1:9000"
+    ErrorDocument 503 /icingaweb2/error_unavailable.html
+</FilesMatch>
+```
+
+**Switch NagVis to PHP-FPM**
+
+Please make sure to use at least NagVis 1.9.5!
+
+Update `/etc/httpd/conf.d/nagvis.conf` similar to [icingaweb2.conf](https://github.com/Icinga/icingaweb2/blob/master/packages/files/apache/icingaweb2.fpm.conf).
+
+**Adjust the session.save_path**
+
+For system PHP running in Apache httpd, update `/etc/httpd/conf.d/php.conf`:
+```apache
+php_value session.save_path    "/var/opt/rh/rh-php71/lib/php/session"
+```
+
+Also see [PHP-FPM in Apache httpd Wiki](https://wiki.apache.org/httpd/PHP-FPM).
 
 ## FAQ
 
@@ -195,5 +231,3 @@ Specify a different `default-map` in the `nagvis.ini.php` configuration file.
 There are many ways to contribute to the Icinga Web module for NagVis --
 whether it be sending patches, testing, reporting bugs, or reviewing and
 updating the documentation. Every contribution is appreciated!
-
-

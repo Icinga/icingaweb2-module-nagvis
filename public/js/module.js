@@ -25,8 +25,6 @@
             var $iframe = $('#nagvis-iframe');
             var matchNagvis = /[\?&]show=([^\&]+)/;
             var matchIcinga = /[\?&]map=([^\&]+)/;
-            var currentMap = null;
-            var shownMap = null;
 
             icinga.logger.debug('Nagvis frame loaded');
             if (currentMap = $iframe.contents()[0].location.search.match(matchNagvis)) {
@@ -41,10 +39,12 @@
         },
 
         setCurrentMap: function (map) {
-//icinga.logger.info(icinga.utils.addUrlParams(document.location.pathname + '?' + document.location.search, { map: 'asd' }))
-//            var url = parseUrl
-            this.module.icinga.logger.info("Setting current map", map);
-        }
+            var url = icinga.utils.removeUrlParams(document.location.pathname + document.location.search, [ 'map' ]);
+            this.module.icinga.logger.debug('URL AFTER PARAM REMOVE: ' + url);
+            url = icinga.utils.addUrlParams(url, { map: map });
+            this.module.icinga.logger.info('Setting current map', map);
+            location.href = url;
+	}
 
     };
 

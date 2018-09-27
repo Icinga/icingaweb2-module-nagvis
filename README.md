@@ -208,7 +208,7 @@ For system PHP running in Apache httpd, update `/etc/httpd/conf.d/php.conf`:
 ```apache
 php_value session.save_path    "/var/opt/rh/rh-php71/lib/php/session"
 ```
-**Ajust the include_path**
+**Adjust the include_path**
 
 Update `/etc/opt/rh/rh-php71/php.ini`:
 ```apache

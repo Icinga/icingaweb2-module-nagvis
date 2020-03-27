@@ -1,3 +1,4 @@
+Module: nagvis
 Name: NagVis
 Version: 1.1.1
 Depends: monitoring>=2.0.0

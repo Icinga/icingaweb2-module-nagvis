@@ -2,6 +2,7 @@
 
 use Icinga\Application\Config;
 use Icinga\Module\Nagvis\RestrictionHelper;
+use Icinga\Application\Icinga;
 
 $section = $this->menuSection(N_('Maps'))
     ->setIcon('globe');
@@ -10,7 +11,12 @@ $section->add($this->translate('NagVis'))
     ->setUrl('nagvis/show/map');
 
 $prio = 0;
-$restriction = RestrictionHelper::getRegex();
+
+if (Icinga::app()->isCli()) {
+    $restriction = null;
+} else {
+    $restriction = RestrictionHelper::getRegex();
+}
 foreach (Config::module('nagvis')->getSection('menu') as $name => $caption) {
     if ($restriction !== null && ! preg_match($restriction, $name)) {
         continue;

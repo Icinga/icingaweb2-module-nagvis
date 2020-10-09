@@ -117,10 +117,10 @@ class GlobalBackendicingaweb2 implements GlobalBackendInterface {
                  $this->objConfigType = 0;
              }
         } else {
-            return FALSE;
+            return false;
         }
 
-        return TRUE;
+        return true;
     }
 
     /**
@@ -242,9 +242,9 @@ class GlobalBackendicingaweb2 implements GlobalBackendInterface {
      */
     private function checkForIsActiveObjects() {
         if(mysql_num_rows($this->mysqlQuery('SELECT object_id FROM '.$this->dbPrefix.'objects WHERE is_active=1')) > 0) {
-            return TRUE;
+            return true;
         } else {
-            return FALSE;
+            return false;
         }
     }
 
@@ -258,9 +258,9 @@ class GlobalBackendicingaweb2 implements GlobalBackendInterface {
      */
     private function checkConfigTypeObjects() {
         if(mysql_num_rows($this->mysqlQuery('SELECT host_id FROM '.$this->dbPrefix.'hosts WHERE config_type=1 AND instance_id='.$this->dbInstanceId.' LIMIT 1')) > 0) {
-            return TRUE;
+            return true;
         } else {
-            return FALSE;
+            return false;
         }
     }
 

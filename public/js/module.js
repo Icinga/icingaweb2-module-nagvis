@@ -27,6 +27,11 @@
             var matchIcinga = /[\?&]map=([^\&]+)/;
 
             icinga.logger.debug('Nagvis frame loaded');
+
+            if (! $iframe.contents().length) {
+                return;
+            }
+
             if (currentMap = $iframe.contents()[0].location.search.match(matchNagvis)) {
                 currentMap = currentMap[1];
             }

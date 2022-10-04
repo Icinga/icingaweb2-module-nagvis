@@ -70,6 +70,12 @@ class CoreAuthorisationModIcingaweb2 extends CoreAuthorisationModule
         return $perms;
     }
 
+    public function renameMapPermissions($oldName, $newName)
+    {
+        // We don't provide map permission
+        return false;
+    }
+
     public function getUserRoles($userId)
     {
         // $userId is now the username

@@ -270,6 +270,6 @@ semanage fcontext -a -t httpd_sys_rw_content_t "$NAGVIS_ROOT/share/userfiles/(/.
 restorecon -R "$NAGVIS_ROOT"
 ```
 
-_*WARNING*_:  Many system administrators would advise you to disable SELinux or set it to permissive to work around the problem, however this will weaken the security posture of your system. Other advice might counsel you to change the SELinux policy via `audit2allow` to broadent the permissions. Both of these approaches are flawed and will weaken the security of your system overall. Instead, configure file labels for SELinux in order to tell the system that the `nagvis` directories are related to `httpd`, and some of them are OK for the web server to write to. 
+_*WARNING*_:  Many system administrators would advise you to disable SELinux or set it to permissive to work around the problem, however this will weaken the security posture of your system. Other advice might counsel you to change the SELinux policy via `audit2allow` to broaden the permissions. Both of these approaches are flawed and will weaken the security of your system overall. Instead, configure file labels for SELinux in order to tell the system that the `nagvis` directories are related to `httpd`, and some of them are OK for the web server to write to. 
 
 

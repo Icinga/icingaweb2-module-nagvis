@@ -57,16 +57,16 @@ class ServicegroupSummary extends BaseServicegroupSummary
         $unions[0][2] = array_merge(
             $unions[0][2],
             [
-                'service_state_in_downtime'     => new Expression('NULL'),
-                'service_state_is_acknowledged' => new Expression('NULL')
+                'service_state_in_downtime'     => 'service.state.in_downtime',
+                'service_state_is_acknowledged' => 'service.state.is_acknowledged'
             ]
         );
 
         $unions[1][2] = array_merge(
             $unions[1][2],
             [
-                'service_state_in_downtime'     => 'service.state.in_downtime',
-                'service_state_is_acknowledged' => 'service.state.is_acknowledged'
+                'service_state_in_downtime'     => new Expression('NULL'),
+                'service_state_is_acknowledged' => new Expression('NULL')
             ]
         );
 

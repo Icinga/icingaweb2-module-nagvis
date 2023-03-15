@@ -28,7 +28,7 @@ class ServicestateSummary extends Service
                 'SUM(CASE WHEN service_state.soft_state = 1 AND service_state.in_downtime = \'y\' THEN 1 ELSE 0 END)'
             ),
             'services_warning_ack'       => new Expression(
-                'SUM(CASE WHEN service_state.soft_state = 1 AND service_state.is_acknowledged = \'y\' THEN 1 ELSE 0 END)'
+                'SUM(CASE WHEN service_state.soft_state = 1 AND service_state.is_acknowledged != \'n\' THEN 1 ELSE 0 END)'
             ),
             'services_critical'          => new Expression(
                 'SUM(CASE WHEN service_state.soft_state = 2 AND service_state.is_handled = \'n\' THEN 1 ELSE 0 END)'
@@ -37,7 +37,7 @@ class ServicestateSummary extends Service
                 'SUM(CASE WHEN service_state.soft_state = 2 AND service_state.in_downtime = \'y\' THEN 1 ELSE 0 END)'
             ),
             'services_critical_ack'      => new Expression(
-                'SUM(CASE WHEN service_state.soft_state = 2 AND service_state.is_acknowledged = \'y\' THEN 1 ELSE 0 END)'
+                'SUM(CASE WHEN service_state.soft_state = 2 AND service_state.is_acknowledged != \'n\' THEN 1 ELSE 0 END)'
             ),
             'services_unknown'           => new Expression(
                 'SUM(CASE WHEN service_state.soft_state = 3 AND service_state.is_handled = \'n\' THEN 1 ELSE 0 END)'
@@ -46,7 +46,7 @@ class ServicestateSummary extends Service
                 'SUM(CASE WHEN service_state.soft_state = 3 AND service_state.in_downtime = \'y\' THEN 1 ELSE 0 END)'
             ),
             'services_unknown_ack'       => new Expression(
-                'SUM(CASE WHEN service_state.soft_state = 3 AND service_state.is_acknowledged = \'y\' THEN 1 ELSE 0 END)'
+                'SUM(CASE WHEN service_state.soft_state = 3 AND service_state.is_acknowledged != \'n\' THEN 1 ELSE 0 END)'
             )
         ];
     }

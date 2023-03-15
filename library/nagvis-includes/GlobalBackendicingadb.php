@@ -90,7 +90,7 @@ class GlobalBackendicingadb implements GlobalBackendInterface
 
     public function getHostNamesProblematic(): array
     {
-        $result = [];
+        $results = [];
         $query = Host::on($this->getDb())
             ->utilize('state')
             ->utilize('service')
@@ -106,10 +106,10 @@ class GlobalBackendicingadb implements GlobalBackendInterface
         $query->getSelectBase()->groupBy(['name', 'host.display_name']);
 
         foreach ($query as $host) {
-            $result[] = $host->name;
+            $results[] = $host->name;
         }
 
-        return $result;
+        return $results;
     }
 
     public function getObjectsEx($type): array
@@ -119,7 +119,7 @@ class GlobalBackendicingadb implements GlobalBackendInterface
 
     public function getObjects($type, $name1Pattern = '', $name2Pattern = '')
     {
-        $result = [];
+        $results = [];
         $filter = Filter::all();
 
         switch ($type) {
@@ -140,7 +140,7 @@ class GlobalBackendicingadb implements GlobalBackendInterface
                 $query->columns(['name', 'name_ci' => 'display_name']);
                 break;
             default:
-                return $result;
+                return $results;
         }
 
         if ($name1Pattern !== '') {
@@ -159,13 +159,13 @@ class GlobalBackendicingadb implements GlobalBackendInterface
         $query->filter($filter);
 
         foreach ($query as $item) {
-            $result[] = [
+            $results[] = [
                 'name1' => $item instanceof Service ? $item->host->name : $item->name,
                 'name2' => $item instanceof Service ? $item->name : $item->name_ci,
             ];
         }
 
-        return $result;
+        return $results;
     }
 
     public function getHostState($objects, $options, $filters, $isMemberQuery = false)
@@ -328,8 +328,9 @@ class GlobalBackendicingadb implements GlobalBackendInterface
         ]);
         $this->parseFilter($query, $objects, $filters, MEMBER_QUERY, COUNT_QUERY, ! HOST_QUERY);
 
+        $results = [];
         foreach ($query as $item) {
-            $result[$item->host_name] = [
+            $results[$item->host_name] = [
                 // This causes an undefined array key "0" error somewhere in "NagVisHost" class, so I'm commenting
                 // this out as "GlobalBackendPDO" class is doing the same!
                 // 'details' => [ALIAS => $item->host_nameci],
@@ -364,7 +365,7 @@ class GlobalBackendicingadb implements GlobalBackendInterface
             ];
         }
 
-        return $result;
+        return $results;
     }
 
     public function getHostgroupStateCounts($objects, $options, $filters)
@@ -542,7 +543,7 @@ class GlobalBackendicingadb implements GlobalBackendInterface
 
     protected function getGroupStateCounts(Query $query): array
     {
-        $result = [];
+        $results = [];
         $isHostgroup = $query->getModel() instanceof HostgroupSummary;
         foreach ($query as $item) {
             $hostStates = [];
@@ -601,12 +602,12 @@ class GlobalBackendicingadb implements GlobalBackendInterface
                 ]
             ];
 
-            $result[$item->name] = [
+            $results[$item->name] = [
                 'details' => [ALIAS => $item->display_name],
                 'counts'  => $hostStates + $serviceStates
             ];
         }
 
-        return $result;
+        return $results;
     }
 }

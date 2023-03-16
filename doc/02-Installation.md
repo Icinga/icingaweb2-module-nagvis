@@ -44,8 +44,43 @@ icingacli module enable nagvis
 
 This module provides everything for a complete Icinga Web 2 NagVis
 integration, including authentication and authorisation. To get
-everything working as expected, your NagVis configuration should contain
+everything working as expected, your NagVis configuration should contain one of
 the following settings inside `nagvis.ini.php`
+
+### Icinga DB
+
+```ini
+[global]
+authmodule="CoreAuthModIcingaweb2"
+authorisationmodule="CoreAuthorisationModIcingaweb2"
+logonmodule="LogonIcingaweb2"
+
+[paths]
+htmlcgi = "/icingaweb2"
+
+[defaults]
+backend = "icingadb"
+
+urltarget = "_top"
+hosturl="[htmlcgi]/icingadb/host?name=[host_name]"
+hostgroupurl="[htmlcgi]/icingadb/hostgroup?name=[hostgroup_name]"
+serviceurl="[htmlcgi]/icingadb/service?host.name=[host_name]&name=[service_description]"
+servicegroupurl="[htmlcgi]/icingadb/servicegroup?name=[servicegroup_name]"
+mapurl="[htmlcgi]/nagvis/show/map?map=[map_name]"
+stylesheet="icingaweb-nagvis-integration.css"
+
+[backend_icingadb]
+backendtype="icingadb"
+dbhost="localhost"
+dbport=3306
+dbname="icingadb"
+dbuser="icingadb"
+dbpass="icingadb"
+dbinstancename="default"
+;maxtimewithoutupdate=180
+```
+
+### Monitoring (IDO)
 
 ```ini
 [global]
@@ -126,7 +161,7 @@ redirection loop.
 
 To get the integration running and to allow NagVis to find the configured
 handlers you need to add a short piece of code to
-`<nagvisdir>/share/server/core/functions/index.php`:
+`<nagvisdir>/share/server/core/functions/core.php`:
 
 ```php
 /**
@@ -142,6 +177,14 @@ require_once EmbeddedWeb::start('/usr/share/icingaweb2', '/etc/icingaweb2')
 ```
 
 This has to sit on top of the page, but after the `<?php` line.
+
+Additionally, to make sure that the `icingadb` backend type provided by this module is being detected by `Nagvis`, you
+either need to manually copy the `/usr/share/icingaweb2/modules/nagvis/library/nagvis-includes/GlobalBackendicingadb.php`
+file into the `<nagvisdir>/nagvis/share/server/core/classes` directory or you can just create a symlink.
+
+```bash
+ln -s /usr/share/icingaweb2/modules/nagvis/library/nagvis-includes/GlobalBackendicingadb.php <nagvisdir>/nagvis/share/server/core/classes/GlobalBackendicingadb.php
+```
 
 ### PHP on CentOS
 

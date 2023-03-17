@@ -26,7 +26,7 @@ class HostgroupSummary extends BaseHostgroupSummary
                 'SUM(CASE WHEN host_state = 1 AND host_handled = \'n\' THEN 1 ELSE 0 END)'
             ),
             'hosts_down_downtime'        => new Expression(
-                'SUM(CASE WHEN host_state = 1 AND host_state_in_downtime = \'y\' THEN 1 ELSE 0 END)'
+                'SUM(CASE WHEN host_state = 1 AND host_state_in_downtime = \'y\' AND host_state_is_acknowledged = \'n\' THEN 1 ELSE 0 END)'
             ),
             'hosts_down_ack'             => new Expression(
                 'SUM(CASE WHEN host_state = 1 AND host_state_is_acknowledged != \'n\' THEN 1 ELSE 0 END)'
@@ -35,7 +35,7 @@ class HostgroupSummary extends BaseHostgroupSummary
                 'SUM(CASE WHEN host_state = 2 AND host_handled = \'n\' THEN 1 ELSE 0 END)'
             ),
             'hosts_unreachable_downtime' => new Expression(
-                'SUM(CASE WHEN host_state = 2 AND host_state_in_downtime = \'y\' THEN 1 ELSE 0 END)'
+                'SUM(CASE WHEN host_state = 2 AND host_state_in_downtime = \'y\' AND host_state_is_acknowledged = \'n\' THEN 1 ELSE 0 END)'
             ),
             'hosts_unreachable_ack'      => new Expression(
                 'SUM(CASE WHEN host_state = 2 AND host_state_is_acknowledged != \'n\' THEN 1 ELSE 0 END)'
@@ -44,7 +44,7 @@ class HostgroupSummary extends BaseHostgroupSummary
                 'SUM(CASE WHEN host_state = 3 AND host_handled = \'n\' THEN 1 ELSE 0 END)'
             ),
             'hosts_unknown_downtime'     => new Expression(
-                'SUM(CASE WHEN host_state = 3 AND host_state_in_downtime = \'y\' THEN 1 ELSE 0 END)'
+                'SUM(CASE WHEN host_state = 3 AND host_state_in_downtime = \'y\' AND host_state_is_acknowledged = \'n\' THEN 1 ELSE 0 END)'
             ),
             'hosts_unknown_ack'          => new Expression(
                 'SUM(CASE WHEN host_state = 3 AND host_state_is_acknowledged != \'n\' THEN 1 ELSE 0 END)'
@@ -63,7 +63,7 @@ class HostgroupSummary extends BaseHostgroupSummary
                 'SUM(CASE WHEN service_state = 1 AND service_handled = \'n\' THEN 1 ELSE 0 END)'
             ),
             'services_warning_downtime'  => new Expression(
-                'SUM(CASE WHEN service_state = 1 AND service_state_in_downtime = \'y\' THEN 1 ELSE 0 END)'
+                'SUM(CASE WHEN service_state = 1 AND service_state_in_downtime = \'y\' AND service_state_is_acknowledged = \'n\' THEN 1 ELSE 0 END)'
             ),
             'services_warning_ack'       => new Expression(
                 'SUM(CASE WHEN service_state = 1 AND service_state_is_acknowledged != \'n\' THEN 1 ELSE 0 END)'
@@ -72,7 +72,7 @@ class HostgroupSummary extends BaseHostgroupSummary
                 'SUM(CASE WHEN service_state = 2 AND service_handled = \'n\' THEN 1 ELSE 0 END)'
             ),
             'services_critical_downtime' => new Expression(
-                'SUM(CASE WHEN service_state = 2 AND service_state_in_downtime = \'y\' THEN 1 ELSE 0 END)'
+                'SUM(CASE WHEN service_state = 2 AND service_state_in_downtime = \'y\' AND service_state_is_acknowledged = \'n\' THEN 1 ELSE 0 END)'
             ),
             'services_critical_ack'      => new Expression(
                 'SUM(CASE WHEN service_state = 2 AND service_state_is_acknowledged != \'n\' THEN 1 ELSE 0 END)'
@@ -81,7 +81,7 @@ class HostgroupSummary extends BaseHostgroupSummary
                 'SUM(CASE WHEN service_state = 3 AND service_handled = \'n\' THEN 1 ELSE 0 END)'
             ),
             'services_unknown_downtime'  => new Expression(
-                'SUM(CASE WHEN service_state = 3 AND service_state_in_downtime = \'y\' THEN 1 ELSE 0 END)'
+                'SUM(CASE WHEN service_state = 3 AND service_state_in_downtime = \'y\' AND service_state_is_acknowledged = \'n\' THEN 1 ELSE 0 END)'
             ),
             'services_unknown_ack'       => new Expression(
                 'SUM(CASE WHEN service_state = 3 AND service_state_is_acknowledged != \'n\' THEN 1 ELSE 0 END)'

@@ -82,7 +82,7 @@ class GlobalBackendicingadb implements GlobalBackendInterface
         $query->columns('icinga2_start_time');
 
         if (($instance = $query->first())) {
-            return $instance->icinga2_start_time;
+            return $this->getTimestampFor($instance->icinga2_start_time);
         }
 
         return -1;
@@ -210,10 +210,10 @@ class GlobalBackendicingadb implements GlobalBackendInterface
                 $item->state->state_type === 'hard' ? 1 : 0,
                 $item->state->check_attempt,
                 $item->max_check_attempts,
-                $item->state->last_update,
-                $item->state->next_check,
-                $item->state->last_state_change,
-                $item->state->last_state_change,
+                $this->getTimestampFor($item->state->last_update),
+                $this->getTimestampFor($item->state->next_check),
+                $this->getTimestampFor($item->state->last_state_change),
+                $this->getTimestampFor($item->state->last_state_change),
                 $item->state->performance_data,
                 $item->display_name,
                 $item->name_ci,
@@ -223,8 +223,8 @@ class GlobalBackendicingadb implements GlobalBackendInterface
                 null, // Custom vars
                 $item->downtime->author,
                 $item->downtime->comment,
-                $item->downtime->scheduled_start_time,
-                $item->downtime->scheduled_end_time
+                $this->getTimestampFor($item->downtime->scheduled_start_time),
+                $this->getTimestampFor($item->downtime->scheduled_end_time)
             ];
         }
 
@@ -278,10 +278,10 @@ class GlobalBackendicingadb implements GlobalBackendInterface
                 $item->state->state_type === 'hard' ? 1 : 0,
                 $item->state->check_attempt,
                 $item->max_check_attempts,
-                $item->state->last_update,
-                $item->state->next_check,
-                $item->state->last_state_change,
-                $item->state->last_state_change,
+                $this->getTimestampFor($item->state->last_update),
+                $this->getTimestampFor($item->state->next_check),
+                $this->getTimestampFor($item->state->last_state_change),
+                $this->getTimestampFor($item->state->last_state_change),
                 $item->state->performance_data,
                 $item->display_name,
                 $item->name_ci, // Alias
@@ -291,8 +291,8 @@ class GlobalBackendicingadb implements GlobalBackendInterface
                 null, // Custom vars
                 $item->downtime->author,
                 $item->downtime->comment,
-                $item->downtime->scheduled_start_time,
-                $item->downtime->scheduled_end_time,
+                $this->getTimestampFor($item->downtime->scheduled_start_time),
+                $this->getTimestampFor($item->downtime->scheduled_end_time),
                 $item->name
             ];
 
@@ -609,5 +609,10 @@ class GlobalBackendicingadb implements GlobalBackendInterface
         }
 
         return $results;
+    }
+
+    private function getTimestampFor(DateTime $time = null): ?int
+    {
+        return ! $time ? null : $time->getTimestamp();
     }
 }

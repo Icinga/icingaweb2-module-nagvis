@@ -126,4 +126,9 @@ class CoreAuthModIcingaweb2 extends CoreAuthModule
     {
         return $this->getUser();
     }
+
+    public function usesBcrypt($username)
+    {
+        return false;
+    }
 }

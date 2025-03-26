@@ -73,6 +73,11 @@ class ShowController extends Controller
         $url = $baseurl . '/frontend/nagvis-js/index.php';
         $url .= '?mod=Map&act=view&show=' . urlencode($map);
 
+        if($map == 'global-overview') {
+            $url = $baseurl . '/frontend/nagvis-js/index.php';
+            $url .= '?mod=Overview';
+        }
+
         if ($this->params->get('showMenu')) {
             $url .= '&header_menu=1';
         } else {

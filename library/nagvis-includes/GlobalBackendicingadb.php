@@ -93,9 +93,7 @@ class GlobalBackendicingadb implements GlobalBackendInterface
         $results = [];
         $query = Host::on($this->getDb())
             ->utilize('state')
-            ->utilize('service')
-            ->utilize('service.state')
-            ->columns(['name', 'state.soft_state', 'service.state.soft_state'])
+            ->columns(['name'])
             ->filter(
                 Filter::any(
                     Filter::greaterThan('state.soft_state', 0),
@@ -103,7 +101,7 @@ class GlobalBackendicingadb implements GlobalBackendInterface
                 )
             );
 
-        $query->getSelectBase()->groupBy(['name', 'host.display_name']);
+        $query->getSelectBase()->groupBy(['host.name', 'host.display_name']);
 
         foreach ($query as $host) {
             $results[] = $host->name;
@@ -317,6 +315,7 @@ class GlobalBackendicingadb implements GlobalBackendInterface
         $query = ServicestateSummary::on($this->getDb())
             ->utilize('state')
             ->utilize('host')
+            ->withoutColumns(['id', 'name', 'name_ci'])
             ->withColumns([
                 'host_name'   => 'host.name',
                 'host_nameci' => 'host.name_ci'
@@ -513,15 +512,15 @@ class GlobalBackendicingadb implements GlobalBackendInterface
 
                     if (! isset($parts[1]) && ($type === 'host' || ($type === 'hostgroup' && $isHostQuery))) {
                         $relation = $type === 'host' ? 'service' : 'host';
-                        $objectFilter[] = "$relation.name!={$parts[0]}*";
+                        $objectFilter[] = "$relation.name!~$parts[0]*";
                     } elseif ($type === 'servicegroup' || ($type === 'hostgroup' && ! $isHostQuery)) {
                         if (isset($parts[1])) {
                             // We're trying to exclude all services in a group other than the given host
                             // and service name, so the filter expression has to be like "(TRUE AND TRUE) NOT"
-                            $objectFilter[] = "!(host.name={$parts[0]}*&service.name={$parts[1]}*)";
+                            $objectFilter[] = "!(host.name~$parts[0]*&service.name~$parts[1]*)";
                         } else {
                             $relation = $type === 'servicegroup' ? 'service' : 'host';
-                            $objectFilter[] = "$relation.name!={$parts[0]}*";
+                            $objectFilter[] = "$relation.name!~$parts[0]*";
                         }
                     }
                 }

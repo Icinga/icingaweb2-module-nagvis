@@ -512,15 +512,15 @@ class GlobalBackendicingadb implements GlobalBackendInterface
 
                     if (! isset($parts[1]) && ($type === 'host' || ($type === 'hostgroup' && $isHostQuery))) {
                         $relation = $type === 'host' ? 'service' : 'host';
-                        $objectFilter[] = "$relation.name!={$parts[0]}*";
+                        $objectFilter[] = "$relation.name!~$parts[0]*";
                     } elseif ($type === 'servicegroup' || ($type === 'hostgroup' && ! $isHostQuery)) {
                         if (isset($parts[1])) {
                             // We're trying to exclude all services in a group other than the given host
                             // and service name, so the filter expression has to be like "(TRUE AND TRUE) NOT"
-                            $objectFilter[] = "!(host.name={$parts[0]}*&service.name={$parts[1]}*)";
+                            $objectFilter[] = "!(host.name~$parts[0]*&service.name~$parts[1]*)";
                         } else {
                             $relation = $type === 'servicegroup' ? 'service' : 'host';
-                            $objectFilter[] = "$relation.name!={$parts[0]}*";
+                            $objectFilter[] = "$relation.name!~$parts[0]*";
                         }
                     }
                 }

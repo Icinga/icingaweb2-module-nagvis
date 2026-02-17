@@ -61,6 +61,7 @@ class CoreAuthorisationModIcingaweb2 extends CoreAuthorisationModule
             $perms['Map']['add']    = array('*' => true);
             $perms['Map']['edit']   = array('*' => true);
             $perms['Map']['manage'] = array('*' => true);
+            $perms['Map']['editHtml'] = array('*' => true);
         }
 
         if ($this->auth->hasPermission('nagvis/admin')) {

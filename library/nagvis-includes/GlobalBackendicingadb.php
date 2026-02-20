@@ -611,7 +611,7 @@ class GlobalBackendicingadb implements GlobalBackendInterface
         return $results;
     }
 
-    private function getTimestamp(DateTime $time = null): ?int
+    private function getTimestamp(?DateTime $time = null): ?int
     {
         return ! $time ? null : $time->getTimestamp();
     }

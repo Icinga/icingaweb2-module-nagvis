@@ -40,7 +40,6 @@ class CoreAuthModIcingaweb2 extends CoreAuthModule
         $old_id = session_id();
         $cacheLimiter = ini_get('session.cache_limiter');
         ini_set('session.use_cookies', false);
-        ini_set('session.use_only_cookies', false);
         ini_set('session.cache_limiter', null);
         ini_set('session.cookie_path', '/');
         $icookie = 'Icingaweb2';
@@ -57,7 +56,6 @@ class CoreAuthModIcingaweb2 extends CoreAuthModule
         session_id($old_id);
         session_name($oldname);
         ini_set('session.use_cookies', true);
-        ini_set('session.use_only_cookies', true);
         ini_set('session.cache_limiter', $cacheLimiter);
     }
 

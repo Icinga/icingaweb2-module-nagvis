@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2015 Icinga GmbH <https://icinga.com>
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 (function(Icinga) {
 

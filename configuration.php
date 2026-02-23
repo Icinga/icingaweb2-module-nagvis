@@ -1,5 +1,8 @@
 <?php
 
+// SPDX-FileCopyrightText: 2015 Icinga GmbH <https://icinga.com>
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 use Icinga\Application\Config;
 use Icinga\Module\Nagvis\RestrictionHelper;
 use Icinga\Application\Icinga;

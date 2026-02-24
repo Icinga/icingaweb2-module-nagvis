@@ -88,6 +88,8 @@ class ShowController extends Controller
 
         if ($height = $this->params->shift('height')) {
             $this->view->height = (int) $height;
+        } else {
+            $this->view->height = '99%';
         }
 
         $this->view->nagvisUrl = $url;

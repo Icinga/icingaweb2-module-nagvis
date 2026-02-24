@@ -8,8 +8,10 @@
 
 if ($this->height) {
     $attr = sprintf(' height="%d"', $height);
-} else {
+} elseif (! $this->compact) {
     $attr = ' height="99%"';
+} else {
+    $attr = '';
 }
 
 ?>

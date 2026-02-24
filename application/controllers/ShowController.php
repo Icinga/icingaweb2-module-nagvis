@@ -82,13 +82,14 @@ class ShowController extends Controller
             $url .= '&header_menu=0';
         }
 
-        $zoom = $this->params->shift('zoom', $this->view->compact ? 47 : null);
-        if ($zoom) {
+        if ($zoom = $this->params->shift('zoom')) {
             $url .= '&zoom=' . (int) $zoom;
         }
 
         if ($height = $this->params->shift('height')) {
             $this->view->height = (int) $height;
+        } else {
+            $this->view->height = '99%';
         }
 
         $this->view->nagvisUrl = $url;

@@ -7,9 +7,7 @@
 <?php
 
 if ($this->height) {
-    $attr = sprintf(' height="%d"', $height);
-} elseif (! $this->compact) {
-    $attr = ' height="99%"';
+    $attr = sprintf(' height="%s"', $height);
 } else {
     $attr = '';
 }

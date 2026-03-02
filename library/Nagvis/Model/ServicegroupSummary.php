@@ -51,7 +51,7 @@ class ServicegroupSummary extends BaseServicegroupSummary
         ];
     }
 
-    public function getUnions()
+    public function getUnions(): array
     {
         $unions = parent::getUnions();
         $unions[0][2] = array_merge(

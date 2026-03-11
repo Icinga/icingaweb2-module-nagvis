@@ -1,5 +1,8 @@
 <?php
 
+// SPDX-FileCopyrightText: 2018 Icinga GmbH <https://icinga.com>
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 namespace Icinga\Module\Nagvis\Controllers;
 
 use Icinga\Module\Nagvis\RestrictionHelper;
@@ -85,6 +88,8 @@ class ShowController extends Controller
 
         if ($height = $this->params->shift('height')) {
             $this->view->height = (int) $height;
+        } else {
+            $this->view->height = '99%';
         }
 
         $this->view->nagvisUrl = $url;

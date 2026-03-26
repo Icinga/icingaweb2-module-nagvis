@@ -5,6 +5,7 @@
 This module glues NagVis and Icinga Web 2 together. Both of them are required
 to be installed and configured:
 
+* PHP ≥ 8.2
 * [Icinga Web 2](https://www.icinga.com/products/icinga-web-2/) (>= 2.4.1)
 * [NagVis](https://www.nagvis.org/) (&gt;= 1.8)
 

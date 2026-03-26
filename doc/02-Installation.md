@@ -5,8 +5,9 @@
 This module glues NagVis and Icinga Web 2 together. Both of them are required
 to be installed and configured:
 
-* [Icinga Web 2](https://www.icinga.com/products/icinga-web-2/) (>= 2.4.1)
-* [NagVis](https://www.nagvis.org/) (&gt;= 1.8)
+* PHP ≥ 8.2
+* [Icinga Web 2](https://www.icinga.com/products/icinga-web-2/) ≥ 2.12.5
+* [NagVis](https://www.nagvis.org/) ≥ 1.8
 
 
 ## Install module
@@ -216,16 +217,17 @@ Update `/etc/httpd/conf.d/nagvis.conf` similar to [icingaweb2.conf](https://gith
 
 **Adjust the session.save_path**
 
-For system PHP running in Apache httpd, update `/etc/httpd/conf.d/php.conf`:
+For system PHP running in Apache httpd, update `/etc/httpd/conf.d/php.conf` so it uses the same session
+directory as PHP-FPM:
 ```apache
-php_value session.save_path    "/var/opt/rh/rh-php71/lib/php/session"
+php_value session.save_path    "<path-to-your-php-session-directory>"
 ```
 
 **Adjust the include_path**
 
-Update `/etc/opt/rh/rh-php71/php.ini`:
+Update the active `php.ini` used by Apache and PHP-FPM so they share the same include path, for example:
 ```apache
-include_path = ".:/usr/share/php:/opt/rh/rh-php71/root/usr/share/pear:/opt/rh/rh-php71/root/usr/share/php"
+include_path = ".:/usr/share/php"
 ```
 
 Also see [PHP-FPM in Apache httpd Wiki](https://wiki.apache.org/httpd/PHP-FPM).

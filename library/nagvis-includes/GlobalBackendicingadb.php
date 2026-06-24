@@ -3,6 +3,7 @@
 // SPDX-FileCopyrightText: 2022 Icinga GmbH <https://icinga.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+use Icinga\Module\Icingadb\Common\Auth;
 use Icinga\Module\Icingadb\Common\Database;
 use Icinga\Module\Icingadb\Model\Host;
 use Icinga\Module\Icingadb\Model\Hostgroup;
@@ -21,6 +22,7 @@ use ipl\Web\Filter\QueryString;
 
 class GlobalBackendicingadb implements GlobalBackendInterface
 {
+    use Auth;
     use Database;
 
     const HOST_SERVICE_SEPARATOR = '~~';
@@ -79,6 +81,33 @@ class GlobalBackendicingadb implements GlobalBackendInterface
         return self::$validConfig;
     }
 
+    /**
+     * Apply Icinga DB Web's object restrictions to the given query.
+     *
+     * Reuses the Auth trait's applyRestrictions(), so NagVis honours exactly the
+     * same role restrictions as the Icinga DB overview: icingadb/filter/objects,
+     * icingadb/filter/hosts, icingadb/filter/services and the custom-variable
+     * rules. It is a no-op for unrestricted users (admins are unaffected).
+     *
+     * Fails CLOSED: if a restriction cannot be applied (e.g. it uses a column the
+     * Auth trait does not allow), the error is logged and the calling method
+     * returns an empty result instead of leaking unfiltered data.
+     *
+     * @param Query $query
+     *
+     * @return bool true if the query may be executed, false -> caller returns empty
+     */
+    private function applyUserRestrictions(Query $query): bool
+    {
+        try {
+            $this->applyRestrictions($query);
+            return true;
+        } catch (\Exception $e) {
+            error_log('nagvis-icingadb-filter: applyRestrictions failed -> denying: ' . $e->getMessage());
+            return false;
+        }
+    }
+
     public function getProgramStart()
     {
         $query = Instance::on($this->getDb());
@@ -105,6 +134,10 @@ class GlobalBackendicingadb implements GlobalBackendInterface
             );
 
         $query->getSelectBase()->groupBy(['host.name', 'host.display_name']);
+
+        if (! $this->applyUserRestrictions($query)) {
+            return $results;
+        }
 
         foreach ($query as $host) {
             $results[] = $host->name;
@@ -159,6 +192,10 @@ class GlobalBackendicingadb implements GlobalBackendInterface
 
         $query->filter($filter);
 
+        if (! $this->applyUserRestrictions($query)) {
+            return $results;
+        }
+
         foreach ($query as $item) {
             $results[] = [
                 'name1' => $item instanceof Service ? $item->host->name : $item->name,
@@ -176,6 +213,10 @@ class GlobalBackendicingadb implements GlobalBackendInterface
         $query->setResultSetClass(VolatileStateResults::class);
 
         $this->parseFilter($query, $objects, $filters, $isMemberQuery, false, HOST_QUERY);
+
+        if (! $this->applyUserRestrictions($query)) {
+            return [];
+        }
 
         $results = [];
         foreach ($query as $item) {
@@ -240,6 +281,10 @@ class GlobalBackendicingadb implements GlobalBackendInterface
         $query->setResultSetClass(VolatileStateResults::class);
 
         $this->parseFilter($query, $objects, $filters, $isMemberQuery, false, ! HOST_QUERY);
+
+        if (! $this->applyUserRestrictions($query)) {
+            return [];
+        }
 
         $results = [];
         foreach ($query as $item) {
@@ -331,6 +376,10 @@ class GlobalBackendicingadb implements GlobalBackendInterface
         ]);
         $this->parseFilter($query, $objects, $filters, MEMBER_QUERY, COUNT_QUERY, ! HOST_QUERY);
 
+        if (! $this->applyUserRestrictions($query)) {
+            return [];
+        }
+
         $results = [];
         foreach ($query as $item) {
             $results[$item->host_name] = [
@@ -376,6 +425,10 @@ class GlobalBackendicingadb implements GlobalBackendInterface
         $query = HostgroupSummary::on($this->getDb());
         $this->parseFilter($query, $objects, $filters, MEMBER_QUERY, COUNT_QUERY, HOST_QUERY);
 
+        if (! $this->applyUserRestrictions($query)) {
+            return [];
+        }
+
         return $this->getGroupStateCounts($query);
     }
 
@@ -383,6 +436,10 @@ class GlobalBackendicingadb implements GlobalBackendInterface
     {
         $query = ServicegroupSummary::on($this->getDb());
         $this->parseFilter($query, $objects, $filters, MEMBER_QUERY, COUNT_QUERY, ! HOST_QUERY);
+
+        if (! $this->applyUserRestrictions($query)) {
+            return [];
+        }
 
         return $this->getGroupStateCounts($query);
     }
@@ -392,6 +449,10 @@ class GlobalBackendicingadb implements GlobalBackendInterface
         // As Icinga DB doesn't support dependencies at the moment, just get all available hosts
         $query = Host::on($this->getDb());
         $query->columns(['name']);
+
+        if (! $this->applyUserRestrictions($query)) {
+            return [];
+        }
 
         $results = [];
         foreach ($query as $item) {
@@ -430,6 +491,10 @@ class GlobalBackendicingadb implements GlobalBackendInterface
             ->columns(['name'])
             ->filter(Filter::equal('hostgroup.name', $hostGroupName));
 
+        if (! $this->applyUserRestrictions($hosts)) {
+            return [];
+        }
+
         $results = [];
         foreach ($hosts as $host) {
             $results[] = $host->name;
@@ -444,6 +509,10 @@ class GlobalBackendicingadb implements GlobalBackendInterface
         $services = Service::on($this->getDb())
             ->with(['servicegroup', 'host'])
             ->filter(Filter::equal('servicegroup.name', $serviceGroupName));
+
+        if (! $this->applyUserRestrictions($services)) {
+            return [];
+        }
 
         foreach ($services as $service) {
             $results[] = [

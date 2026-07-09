@@ -22,3 +22,8 @@ Do **not** add `default-map` to NagVis' `nagvis.ini.php`: it is an Icinga Web 2
 module option, not a NagVis configuration option.
 
 An explicit `map` URL parameter takes precedence over this setting.
+
+### Use the map overview provided by NagVis
+
+You can set `default-map` to `global-overview` to use the built-in overview page from NagVis.
+This automatically only shows maps the user has access to.

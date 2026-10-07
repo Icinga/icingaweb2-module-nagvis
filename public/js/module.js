@@ -22,36 +22,67 @@
         },
 
         frameLoaded: function (event) {
-            var currentMap;
             var icinga = this.module.icinga;
-            var $iframe = $('#nagvis-iframe');
-            var matchNagvis = /[\?&]show=([^\&]+)/;
-            var matchIcinga = /[\?&]map=([^\&]+)/;
-
+            var frame = event.currentTarget;
             icinga.logger.debug('Nagvis frame loaded');
 
-            if (! $iframe.contents().length) {
+            if (! frame || ! frame.contentWindow) {
                 return;
             }
 
-            if (currentMap = $iframe.contents()[0].location.search.match(matchNagvis)) {
-                currentMap = currentMap[1];
+            var frameUrl;
+            try {
+                frameUrl = new URL(frame.contentWindow.location.href);
+            } catch (e) {
+                // A different-origin NagVis installation cannot expose its URL to us.
+                icinga.logger.debug('Nagvis frame location is not accessible; skipping map sync');
+                return;
             }
-            if (shownMap = document.location.search.match(matchIcinga)) {
-                shownMap = shownMap[1];
+
+            if (! /\/frontend\/nagvis-js\/index\.php$/.test(frameUrl.pathname)) {
+                return;
             }
-            if (currentMap !== null && shownMap !== currentMap) {
+
+            var params = frameUrl.searchParams;
+            if (params.get('mod') !== 'Map') {
+                return;
+            }
+
+            var parentParams = new URLSearchParams(window.location.search);
+            var currentMap = params.get('show');
+            var shownMap = parentParams.get('map');
+            if (currentMap === null || currentMap === '') {
+                return;
+            }
+
+            if (shownMap !== currentMap) {
+                // Reload the parent first: its controller will render the new map
+                // with the requested header_menu value.
                 this.setCurrentMap(currentMap);
+                return;
+            }
+
+            // NagVis's own map links can omit header_menu. When the selected map
+            // stays the same, the parent does not reload and its Show/Hide control
+            // otherwise becomes inconsistent with the menu actually in the iframe.
+            var desiredMenu = parentParams.get('showMenu') === '1' ? '1' : '0';
+            if (params.get('header_menu') !== desiredMenu) {
+                params.set('header_menu', desiredMenu);
+                icinga.logger.debug('Restoring Nagvis menu state', desiredMenu);
+                // Replace the iframe entry, not the parent page or its history.
+                // The next load sees the correct parameter and does not reload.
+                frame.contentWindow.location.replace(frameUrl.toString());
             }
         },
 
         setCurrentMap: function (map) {
-            var url = icinga.utils.removeUrlParams(document.location.pathname + document.location.search, [ 'map' ]);
-            this.module.icinga.logger.debug('URL AFTER PARAM REMOVE: ' + url);
-            url = icinga.utils.addUrlParams(url, { map: map });
+            var url = new URL(window.location.href);
+            url.searchParams.set('map', map);
             this.module.icinga.logger.info('Setting current map', map);
-            location.href = url;
-	}
+            // Preserve showMenu when reloading, so the NagVis iframe also gets
+            // the requested header_menu setting for the newly selected map.
+            window.location.assign(url.toString());
+        }
 
     };
 

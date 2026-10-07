@@ -3,8 +3,11 @@
 // SPDX-FileCopyrightText: 2022 Icinga GmbH <https://icinga.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+use Icinga\Module\Icingadb\Common\Auth;
+use Icinga\Module\Icingadb\Common\Backend;
 use Icinga\Module\Icingadb\Common\Database;
 use Icinga\Module\Icingadb\Model\Host;
+use Icinga\Module\Icingadb\Model\DependencyNode;
 use Icinga\Module\Icingadb\Model\Hostgroup;
 use Icinga\Module\Icingadb\Model\Instance;
 use Icinga\Module\Icingadb\Model\Service;
@@ -21,6 +24,7 @@ use ipl\Web\Filter\QueryString;
 
 class GlobalBackendicingadb implements GlobalBackendInterface
 {
+    use Auth;
     use Database;
 
     const HOST_SERVICE_SEPARATOR = '~~';
@@ -403,8 +407,7 @@ class GlobalBackendicingadb implements GlobalBackendInterface
 
     public function getDirectChildNamesByHostName($hostName)
     {
-        // FIXME: Implement me once https://github.com/Icinga/icingadb/issues/347 is closed
-        return [];
+        return $this->getDirectRelatedHostNames($hostName, false);
     }
 
     public function getDirectChildDependenciesNamesByHostName($hostName, $minBusinessImpact = false): array
@@ -414,13 +417,71 @@ class GlobalBackendicingadb implements GlobalBackendInterface
 
     public function getDirectParentNamesByHostName($hostName)
     {
-        // FIXME: Implement me once https://github.com/Icinga/icingadb/issues/347 is closed
-        return [];
+        return $this->getDirectRelatedHostNames($hostName, true);
     }
 
     public function getDirectParentDependenciesNamesByHostName($hostName, $minBusinessImpact = false): array
     {
         return $this->getDirectParentNamesByHostName($hostName);
+    }
+
+    /**
+     * Apply the same object restrictions as Icinga DB Web before fetching
+     * any dependency data. If authorization fails, return no relationships.
+     */
+    private function applyDependencyRestrictions(Query $query): bool
+    {
+        try {
+            $this->applyRestrictions($query);
+            return true;
+        } catch (\Throwable $e) {
+            error_log('nagvis-icingadb: cannot apply dependency restrictions: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    private function getDirectRelatedHostNames(string $hostName, bool $parents): array
+    {
+        if (
+            ! class_exists(DependencyNode::class)
+            || ! method_exists(DependencyNode::class, 'forHost')
+            || (method_exists(Backend::class, 'supportsDependencies') && ! Backend::supportsDependencies())
+        ) {
+            return [];
+        }
+
+        $hostQuery = Host::on($this->getDb())
+            ->columns(['id'])
+            ->filter(Filter::equal('name', $hostName));
+
+        // The starting host must be visible to the current Icinga DB Web user.
+        if (! $this->applyDependencyRestrictions($hostQuery)) {
+            return [];
+        }
+
+        $host = $hostQuery->first();
+        if (! $host) {
+            return [];
+        }
+
+        $nodes = DependencyNode::forHost($host->id, $this->getDb(), $parents)
+            ->with(['host', 'service'])
+            ->filter(Filter::all(
+                Filter::like('host.id', '*'),
+                Filter::unlike('service.id', '*')
+            ));
+
+        // Do not reveal parent/child host names excluded by the user's role.
+        if (! $this->applyDependencyRestrictions($nodes)) {
+            return [];
+        }
+
+        $results = [];
+        foreach ($nodes as $node) {
+            $results[] = $node->host->name;
+        }
+
+        return array_values(array_unique($results));
     }
 
     public function getHostNamesInHostgroup($hostGroupName): array

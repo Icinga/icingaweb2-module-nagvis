@@ -376,7 +376,7 @@ class GlobalBackendicingadb implements GlobalBackendInterface
         $query = HostgroupSummary::on($this->getDb());
         $this->parseFilter($query, $objects, $filters, MEMBER_QUERY, COUNT_QUERY, HOST_QUERY);
 
-        return $this->getGroupStateCounts($query);
+        return $this->getGroupStateCounts($query, ! ($options & 2));
     }
 
     public function getServicegroupStateCounts($objects, $options, $filters)
@@ -463,6 +463,38 @@ class GlobalBackendicingadb implements GlobalBackendInterface
         bool $isCountQuery = false,
         bool $isHostQuery = false
     ): self {
+        if ($query instanceof UnionQuery) {
+            foreach ($query->getUnions() as $union) {
+                $model = $union->getModel();
+
+                $union->filter($this->buildFilter(
+                    $objects,
+                    $filters,
+                    $isMemberQuery && ($model instanceof Host || $model instanceof Service),
+                    $isCountQuery,
+                    $model instanceof Host
+                ));
+            }
+        } else {
+            $query->filter($this->buildFilter(
+                $objects,
+                $filters,
+                $isMemberQuery,
+                $isCountQuery,
+                $isHostQuery
+            ));
+        }
+
+        return $this;
+    }
+
+    private function buildFilter(
+        array $objects,
+        array $filters,
+        bool $isMemberQuery,
+        bool $isCountQuery,
+        bool $isHostQuery
+    ) {
         $allFilters = [];
         foreach ($objects as $object) {
             $type = $object[0]->getType();
@@ -508,23 +540,22 @@ class GlobalBackendicingadb implements GlobalBackendInterface
                     default:
                         throw new BackendConnectionProblem('Invalid filter key (' . $filter['key'] . ')');
                 }
+            }
 
-                if ($isMemberQuery && $object[0]->hasExcludeFilters($isCountQuery)) { // Filter excludes
-                    $filter = $object[0]->getExcludeFilter($isCountQuery);
-                    $parts = Str::trimSplit($filter, self::HOST_SERVICE_SEPARATOR);
+            if ($isMemberQuery && $object[0]->hasExcludeFilters($isCountQuery)) {
+                $excludeFilter = $object[0]->getExcludeFilter($isCountQuery);
+                $parts = Str::trimSplit($excludeFilter, self::HOST_SERVICE_SEPARATOR);
 
-                    if (! isset($parts[1]) && ($type === 'host' || ($type === 'hostgroup' && $isHostQuery))) {
-                        $relation = $type === 'host' ? 'service' : 'host';
+                if (! isset($parts[1]) && ($type === 'host' || ($type === 'hostgroup' && $isHostQuery))) {
+                    $relation = $type === 'host' ? 'service' : 'host';
+                    $objectFilter[] = "$relation.name!~$parts[0]*";
+                } elseif ($type === 'servicegroup' || ($type === 'hostgroup' && ! $isHostQuery)) {
+                    if (isset($parts[1])) {
+                        // Exclude the matching host/service pair from the member query.
+                        $objectFilter[] = "!(host.name~$parts[0]*&service.name~$parts[1]*)";
+                    } else {
+                        $relation = $type === 'servicegroup' ? 'service' : 'host';
                         $objectFilter[] = "$relation.name!~$parts[0]*";
-                    } elseif ($type === 'servicegroup' || ($type === 'hostgroup' && ! $isHostQuery)) {
-                        if (isset($parts[1])) {
-                            // We're trying to exclude all services in a group other than the given host
-                            // and service name, so the filter expression has to be like "(TRUE AND TRUE) NOT"
-                            $objectFilter[] = "!(host.name~$parts[0]*&service.name~$parts[1]*)";
-                        } else {
-                            $relation = $type === 'servicegroup' ? 'service' : 'host';
-                            $objectFilter[] = "$relation.name!~$parts[0]*";
-                        }
                     }
                 }
             }
@@ -532,19 +563,10 @@ class GlobalBackendicingadb implements GlobalBackendInterface
             $allFilters[] = implode('&', $objectFilter);
         }
 
-        $parsedFilter = QueryString::fromString(implode('|', $allFilters))->parse();
-        if ($query instanceof UnionQuery) {
-            foreach ($query->getUnions() as $union) {
-                $union->filter($parsedFilter);
-            }
-        } else {
-            $query->filter($parsedFilter);
-        }
-
-        return $this;
+        return QueryString::fromString(implode('|', $allFilters))->parse();
     }
 
-    protected function getGroupStateCounts(Query $query): array
+    protected function getGroupStateCounts(Query $query, bool $includeServices = true): array
     {
         $results = [];
         $isHostgroup = $query->getModel() instanceof HostgroupSummary;
@@ -607,7 +629,7 @@ class GlobalBackendicingadb implements GlobalBackendInterface
 
             $results[$item->name] = [
                 'details' => [ALIAS => $item->display_name],
-                'counts'  => $hostStates + $serviceStates
+                'counts'  => $includeServices ? $hostStates + $serviceStates : $hostStates
             ];
         }
 

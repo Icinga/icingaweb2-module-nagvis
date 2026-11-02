@@ -158,6 +158,39 @@ Before doing so please log out from Icinga Web 2 and close your browser,
 just to be on the safe side. You could otherwise lock your browser in a
 redirection loop.
 
+### External web-server authentication
+
+If Icinga Web 2 uses external authentication (for example, Apache SSO or
+HTTP Basic authentication configured with `[autologin] backend = external`),
+the authenticated identity must also be available to PHP when the browser
+loads the **standalone NagVis application**, not just the Icinga Web 2 route.
+
+The NagVis integration bootstraps Icinga Web 2 on its own PHP requests.
+Icinga Web 2 checks an externally authenticated session against the identity
+provided by the current request. If that identity is missing or has changed,
+Icinga Web 2 revokes the session, and NagVis may report `not authenticated`
+even when the Icinga Web 2 interface works.
+
+Verify that:
+
+- Both the Icinga Web 2 and standalone NagVis URLs require the intended
+  authentication and the web server makes the **same authenticated username**
+  available to PHP in the same identity variable used for the Icinga Web 2
+  login (`REMOTE_USER` or `REDIRECT_REMOTE_USER`). For PHP-FPM
+  setups, ensure the verified web-server identity is passed to the PHP handler
+  for **both** applications.
+- The Icinga Web 2 session cookie reaches the standalone NagVis URL (see the
+  `[cookie] path` setting above), and both applications can access the same
+  PHP session storage.
+- Any reverse proxy forwards the authenticated identity through a trusted,
+  protected configuration. **Never** derive `REMOTE_USER` from a client-supplied
+  HTTP header without verifying authentication at the proxy or web server.
+
+Do not work around a missing external identity by disabling Icinga Web 2's
+session identity check: that check prevents a session authenticated as one
+external user from being accepted as a different user. The exact Apache,
+reverse-proxy and PHP-FPM settings depend on your deployment.
+
 ### PHP code integration
 
 To get the integration running and to allow NagVis to find the configured

@@ -3,10 +3,12 @@
 // SPDX-FileCopyrightText: 2022 Icinga GmbH <https://icinga.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+use Icinga\Module\Icingadb\Common\Backend;
 use Icinga\Module\Icingadb\Common\Database;
 use Icinga\Module\Icingadb\Model\Host;
 use Icinga\Module\Icingadb\Model\Hostgroup;
 use Icinga\Module\Icingadb\Model\Instance;
+use Icinga\Module\Icingadb\Model\RedundancyGroup;
 use Icinga\Module\Icingadb\Model\Service;
 use Icinga\Module\Icingadb\Model\Servicegroup;
 use Icinga\Module\Icingadb\Redis\VolatileStateResults;
@@ -389,9 +391,21 @@ class GlobalBackendicingadb implements GlobalBackendInterface
 
     public function getHostNamesWithNoParent()
     {
-        // As Icinga DB doesn't support dependencies at the moment, just get all available hosts
-        $query = Host::on($this->getDb());
-        $query->columns(['name']);
+        if (! Backend::supportsDependencies()) {
+            // As Icinga DB doesn't support dependencies at the moment, just get all available hosts
+            $query = Host::on($this->getDb());
+            $query->columns(['name']);
+        } else {
+            $query = Host::on($this->getDb())
+                ->columns(['host.name'])
+                ->filter(
+                    Filter::any(
+                        Filter::unlike('dependency_node.id', '*'), // If it's not in the dependency_node table.
+                        // Or, has no parent dependency nodes (i.e., it's the root node).
+                        Filter::unlike('dependency_node.parent.id', '*'),
+                    )
+                );
+        }
 
         $results = [];
         foreach ($query as $item) {
@@ -403,8 +417,31 @@ class GlobalBackendicingadb implements GlobalBackendInterface
 
     public function getDirectChildNamesByHostName($hostName)
     {
-        // FIXME: Implement me once https://github.com/Icinga/icingadb/issues/347 is closed
-        return [];
+        if (! Backend::supportsDependencies()) {
+            return [];
+        }
+
+        $hosts = Host::on($this->getDb())
+            ->columns(['host.name'])
+            ->filter(Filter::equal('dependency_node.parent.host.name', $hostName));
+
+        $children = [];
+        foreach ($hosts as $host) {
+            $children[] = $host->name;
+        }
+
+        // Resolve child -> RG{P1, P2, ...} as well since those parents can't be accessed via the above executed query.
+        $rgs = RedundancyGroup::on($this->getDb())
+            ->columns(['child.host.name'])
+            ->filter(Filter::equal('parent.host.name', $hostName));
+
+        foreach ($rgs as $rg) {
+            if (! in_array($rg->child->host->name, $children, true)) {
+                $children[] = $rg->child->host->name;
+            }
+        }
+
+        return $children;
     }
 
     public function getDirectChildDependenciesNamesByHostName($hostName, $minBusinessImpact = false): array
@@ -414,8 +451,31 @@ class GlobalBackendicingadb implements GlobalBackendInterface
 
     public function getDirectParentNamesByHostName($hostName)
     {
-        // FIXME: Implement me once https://github.com/Icinga/icingadb/issues/347 is closed
-        return [];
+        if (! Backend::supportsDependencies()) {
+            return [];
+        }
+
+        $hosts = Host::on($this->getDb())
+            ->columns(['host.name'])
+            ->filter(Filter::equal('dependency_node.child.host.name', $hostName));
+
+        $parents = [];
+        foreach ($hosts as $host) {
+            $parents[] = $host->name;
+        }
+
+        // See comments in getDirectChildNamesByHostName.
+        $rgs = RedundancyGroup::on($this->getDb())
+            ->columns(['child.parent.name'])
+            ->filter(Filter::equal('parent.child.name', $hostName));
+
+        foreach ($rgs as $rg) {
+            if (! in_array($rg->parent->name, $parents, true)) {
+                $parents[] = $rg->parent->host->name;
+            }
+        }
+
+        return $parents;
     }
 
     public function getDirectParentDependenciesNamesByHostName($hostName, $minBusinessImpact = false): array
